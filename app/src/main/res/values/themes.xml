@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.CekIdPel" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#727FFF</item>
+        <item name="colorPrimaryVariant">#00E1CF</item>
+        <item name="colorOnPrimary">#DDBBBB</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#2C92FF</item>
+        <item name="colorSecondaryVariant">#BCEE00FF</item>
+        <item name="colorOnSecondary">#FF23FA</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>
