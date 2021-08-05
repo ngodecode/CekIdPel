@@ -6,13 +6,11 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -36,8 +34,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.edtMeter.setText("522011228815")
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.dataCaptcha.observe(this, Observer {
@@ -81,6 +77,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        binding.btnCheckSubsidi.setOnClickListener {
+            startNewActivity(this, "com.ftools.ceksubsidi")
+        }
+
         binding.btnCheck.setOnClickListener {
             binding.webView.loadData("<html></html>", "text/html", "UTF-8")
             binding.edtMeter.text.toString().let {
@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Mohon ini nomor Meter/Pelanggan dengan benar", Toast.LENGTH_SHORT).show()
                 }
                 else {
+                    binding.edtMeter.clearFocus()
                     dialog = setProgressDialog(this, "Menyiapkan data").apply {
                         show()
                     }
@@ -218,6 +219,9 @@ class MainActivity : AppCompatActivity() {
 
     var rewardedAd: RewardedInterstitialAd? = null
     private fun showRewardAds() {
+        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE).getBoolean("ADS_IGNORE", false)) {
+            return
+        }
         RewardedInterstitialAd.load(this@MainActivity,
             resources.getString(R.string.ads_unit_reward),
             AdRequest.Builder().build(),
@@ -275,6 +279,17 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss() }
         dialog.show()
 
+    }
+
+    fun startNewActivity(context: Context, packageName: String) {
+        var intent = context.packageManager.getLaunchIntentForPackage(packageName)
+        if (intent == null) {
+            // Bring user to the market or let them choose an app?
+            intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("market://details?id=$packageName")
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 
     fun getTerms(appName: String) : String {

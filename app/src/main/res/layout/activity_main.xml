@@ -13,10 +13,8 @@
         android:id="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/ads_unit_banner"
+        ads:adUnitId="@string/ads_unit_banner1"
         android:layout_margin="10dp">
     </com.google.android.gms.ads.AdView>
 
@@ -27,7 +25,7 @@
         android:textSize="18sp"
         android:gravity="center"
         android:textColor="#000"
-        android:text="Masukan nomor Meter\natau Scan BARCODE menggunakan kamera"
+        android:text="Masukan id Pel/Meter\natau Scan BARCODE menggunakan kamera"
         android:layout_margin="8dp"/>
 
     <RelativeLayout
@@ -50,13 +48,11 @@
             android:layout_height="52dp"
             android:gravity="center"
             android:layout_toLeftOf="@+id/btnScan"
-            android:hint="NOMOR METER"
+            android:hint="ID PEL / NOMOR METER"
             android:textSize="18sp"
             android:layout_marginRight="8dp"
             android:background="#DCDCDC"/>
     </RelativeLayout>
-
-
 
     <Button
         android:id="@+id/btnCheck"
@@ -68,9 +64,21 @@
         android:background="@drawable/btn_primary"
         android:layout_margin="8dp"/>
 
+    <Button
+        android:id="@+id/btnCheckSubsidi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CEK SUBSIDI/STIMULUS"
+        android:textSize="18sp"
+        android:textColor="@color/btn_primary"
+        android:background="@drawable/btn_primary"
+        android:visibility="visible"
+        android:layout_margin="8dp"/>
+
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"/>
 
 </LinearLayout>

@@ -7,7 +7,18 @@
     android:orientation="vertical"
     tools:context="com.fxlibs.cekidpel.ConfirmationActivity">
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/ads_unit_banner2"
+        android:layout_margin="10dp">
+    </com.google.android.gms.ads.AdView>
+
     <TextView
+        android:id="@+id/txtLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Ketik ulang kode huruf atau angka yang muncul dibawah"
@@ -19,7 +30,8 @@
         android:id="@+id/imgCapcha"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:scaleType="centerInside"/>
+        android:scaleType="fitCenter"
+        android:layout_margin="16dp"/>
 
     <EditText
         android:id="@+id/edtCapcha"

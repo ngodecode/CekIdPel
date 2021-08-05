@@ -58,14 +58,14 @@ class MainViewModel : ViewModel() {
 
     }
 
-    fun getInfo(capcha:String, idPel:String) {
-        val body = "5|0|8|https://pelanggan.pln.co.id/id.co.iconpln.web.PDMohonEntryPoint/|AB6BB8F2A9B546B9DE2B259C9242D117|id.co.iconpln.web.client.service.TransService|getDataPelangganBykriteria|java.lang.String/2004016611|nometer|$idPel|$capcha|1|2|3|4|3|5|5|5|6|7|8|"
+    fun getInfo(capcha:String, idPel:String, by:String = "nometer") {
+        val body = "5|0|8|https://pelanggan.pln.co.id/id.co.iconpln.web.PDMohonEntryPoint/|AB6BB8F2A9B546B9DE2B259C9242D117|id.co.iconpln.web.client.service.TransService|getDataPelangganBykriteria|java.lang.String/2004016611|$by|$idPel|$capcha|1|2|3|4|3|5|5|5|6|7|8|"
         val cookie = "_ga=GA1.3.1439579538.1597333509; _gid=GA1.3.1006617863.1597333509$mCookie"
         ApiPLN.get().getInfo(cookie, body)
             .enqueue(object : Callback<String>{
 
                 val knownKeys = HashSet<String>().apply {
-                    addAll("nama,idpel,nometer_kwh,daya,nama_kec,nama_kel,nama_prov,nama_kab,tarif".split(","))
+                    addAll("nama,idpel,nometer_kwh,daya,nama_kec,nama_kel,nama_prov,nama_kab,tarif,kd_kel,namapnj".split(","))
                 }
 
                 fun getValue(list:ArrayList<String>, key:String) : String? {
@@ -111,23 +111,29 @@ class MainViewModel : ViewModel() {
                         val idpel = getValue(list, "idpel")
                         val daya  = getValue(list, "daya")
                         val nometer_kwh = getValue(list, "nometer_kwh")
-                        val nama_kec    = getValue(list, "nama_kec")
-                        val nama_kel    = getValue(list, "nama_kel")
-                        val nama_prov   = getValue(list, "nama_prov")
-                        val nama_kab    = getValue(list, "nama_kab")
-                        val tarif = getValue(list, "tarif")?.let {        }
+                        val nama_kec    = getValue(list, "nama_kec") ?: ""
+                        val nama_kel    = getValue(list, "nama_kel") ?: ""
+                        val nama_prov   = getValue(list, "nama_prov")?: ""
+                        val nama_kab    = getValue(list, "nama_kab")?: ""
+                        val namapnj     = getValue(list, "namapnj")?: ""
+                        val tarif = getValue(list, "tarif")
 
+                        if (by == "nometer" && nama == null) {
+                            getInfo(capcha, idPel, "idpel")
+                        }
+                        else {
+                            var html ="<table>"
+                                html +="<tr><td>NAMA</td><td> : $nama </td></tr>" +
+                                    "<tr><td>ID PELANGGAN </td><td> : $idpel</td></tr>" +
+                                    "<tr><td>NOMOR KWH </td><td> : $nometer_kwh </td></tr>" +
+                                    "<tr><td>TARIF </td><td> : $tarif </td></tr>" +
+                                    "<tr><td>DAYA </td><td> : $daya </td></tr>" +
+                                    "<tr><td>LOKASI </td><td> : $namapnj $nama_kec $nama_kel $nama_prov $nama_kab </td></tr>"
 
+                            html += "</table>\n"
+                            getBill(idPel, html)
+                        }
 
-
-                        var html =  "  NAMA : $nama" +
-                                    "\nID PELANGGAN : $idpel" +
-                                    "\nNOMOR KWH : $nometer_kwh" +
-                                    "\nTARIF : $daya" +
-                                    "\nDAYA : $daya" +
-                                    "\nDAYA : $daya" +
-
-                        getBill(idPel, html)
                     } catch (e:Exception) {
                         Log.e(javaClass.name, e.message, e)
                         dataInfo.postValue(Result(Status.ERROR_CONNECTION))
@@ -155,7 +161,7 @@ class MainViewModel : ViewModel() {
                     val data    = json.getString("data")
                     if (status == "2") {
                         val bill = JSONObject(data).getJSONObject("info")
-                        infoBill += "TAGIHAN : Rp. " + DecimalFormat("#,###").format(bill.getString("amount").toDouble()).replace(",", ".")
+                        infoBill += "TAGIHAN BULAN INI SENILAI Rp. " + DecimalFormat("#,###").format(bill.getString("amount").toDouble()).replace(",", ".")
                     }
                     else if (status == "0") {
                         infoBill += data
