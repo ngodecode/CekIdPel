@@ -4,6 +4,7 @@
     package="com.fxlibs.cekidpel">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
     <application
         android:allowBackup="true"

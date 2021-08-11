@@ -77,10 +77,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.btnCheckSubsidi.setOnClickListener {
-            startNewActivity(this, "com.ftools.ceksubsidi")
-        }
-
         binding.btnCheck.setOnClickListener {
             binding.webView.loadData("<html></html>", "text/html", "UTF-8")
             binding.edtMeter.text.toString().let {

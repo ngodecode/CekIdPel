@@ -64,16 +64,6 @@
         android:background="@drawable/btn_primary"
         android:layout_margin="8dp"/>
 
-    <Button
-        android:id="@+id/btnCheckSubsidi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CEK SUBSIDI/STIMULUS"
-        android:textSize="18sp"
-        android:textColor="@color/btn_primary"
-        android:background="@drawable/btn_primary"
-        android:visibility="visible"
-        android:layout_margin="8dp"/>
 
     <WebView
         android:id="@+id/webView"

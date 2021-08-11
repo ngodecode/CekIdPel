@@ -116,7 +116,20 @@ class MainViewModel : ViewModel() {
                         val nama_prov   = getValue(list, "nama_prov")?: ""
                         val nama_kab    = getValue(list, "nama_kab")?: ""
                         val namapnj     = getValue(list, "namapnj")?: ""
-                        val tarif = getValue(list, "tarif")
+                        val tarif       = getValue(list, "tarif")
+                        val subsidi      = tarif?.let {
+                            when {
+                                it.endsWith("M") -> {
+                                    "/ TIDAK BERSUBSIDI"
+                                }
+                                it.endsWith("T") -> {
+                                    "/ BERSUBSIDI"
+                                }
+                                else -> {
+                                    ""
+                                }
+                            }
+                        } ?: ""
 
                         if (by == "nometer" && nama == null) {
                             getInfo(capcha, idPel, "idpel")
@@ -126,7 +139,7 @@ class MainViewModel : ViewModel() {
                                 html +="<tr><td>NAMA</td><td> : $nama </td></tr>" +
                                     "<tr><td>ID PELANGGAN </td><td> : $idpel</td></tr>" +
                                     "<tr><td>NOMOR KWH </td><td> : $nometer_kwh </td></tr>" +
-                                    "<tr><td>TARIF </td><td> : $tarif </td></tr>" +
+                                    "<tr><td>TARIF </td><td> : $tarif $subsidi </td></tr>" +
                                     "<tr><td>DAYA </td><td> : $daya </td></tr>" +
                                     "<tr><td>LOKASI </td><td> : $namapnj $nama_kec $nama_kel $nama_prov $nama_kab </td></tr>"
 
@@ -150,6 +163,8 @@ class MainViewModel : ViewModel() {
     }
 
     private fun getBill(idPel: String, info:String) {
+
+        val link = "\n\n<a href='https://play.google.com/store/apps/details?id=com.ftools.ceksubsidi'> Klik disini untuk Cek Subsidi/Stimulus >> </a>"
         val body = "id=$idPel&jenis=1&kode=TU&hm_csrf_hash_name=5739f00f9517eb39c12732f65c3f3d93"
         ApiTagihan.get().getBillStatus(body).enqueue(object : Callback<String> {
 
@@ -166,16 +181,16 @@ class MainViewModel : ViewModel() {
                     else if (status == "0") {
                         infoBill += data
                     }
-                    dataInfo.postValue(Result(Status.SUCCESS, info + "\n" + infoBill))
+                    dataInfo.postValue(Result(Status.SUCCESS, info + "\n" + infoBill + link))
                 } catch (e:Exception) {
                     Log.e(javaClass.name, e.message, e)
-                    dataInfo.postValue(Result(Status.SUCCESS, info))
+                    dataInfo.postValue(Result(Status.SUCCESS, info + link))
                 }
 
             }
 
             override fun onFailure(call: Call<String>?, t: Throwable?) {
-                dataInfo.postValue(Result(Status.SUCCESS, info))
+                dataInfo.postValue(Result(Status.SUCCESS, info + link))
             }
 
         })
