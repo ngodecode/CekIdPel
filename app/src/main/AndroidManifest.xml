@@ -15,13 +15,14 @@
         android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.fxlibs.cekidpel.ConfirmationActivity"></activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/ads_app_id" />
 
-        <activity android:name="com.fxlibs.cekidpel.MainActivity">
+        <activity
+            android:name="com.fxlibs.cekidpel.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,6 +33,7 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
+        <activity android:name="com.fxlibs.cekidpel.ConfirmationActivity" />
     </application>
 
 </manifest>

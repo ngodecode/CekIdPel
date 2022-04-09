@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.fxlibs.cekidpel.databinding.ActivityMainBinding
+import com.fxlibs.countdown.CountDownDialog
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
@@ -26,7 +27,7 @@ import com.journeyapps.barcodescanner.CaptureActivity
 class MainActivity : AppCompatActivity() {
 
     lateinit var viewModel: MainViewModel
-    lateinit var dialog : Dialog
+    lateinit var dialog: Dialog
 
     private lateinit var binding: ActivityMainBinding
 
@@ -41,8 +42,7 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(Intent(this, ConfirmationActivity::class.java).apply {
                     putExtra("image", it.data)
                 }, REQUEST_CAPCHA)
-            }
-            else {
+            } else {
                 dialog.dismiss()
                 Toast.makeText(
                     this,
@@ -56,8 +56,23 @@ class MainActivity : AppCompatActivity() {
             when (it.status) {
                 MainViewModel.Status.SUCCESS -> {
                     it.data?.let { html ->
-                        showRewardAds()
-                        binding.webView.loadData(html.replace("\n", "<br>"), "text/html", "UTF-8")
+                        CountDownDialog(
+                            context = this,
+                            title = "Memuat Informasi",
+                            description = "Anda dapat mempercepat waktu dengan menonton iklan",
+                            onAction = { cdDialog ->
+                                showRewardAds {
+                                    cdDialog.dismiss()
+                                    binding.webView.loadData(
+                                        html.replace("\n", "<br>"),
+                                        "text/html",
+                                        "UTF-8"
+                                    )
+                                }
+                            },
+                            textAction = "LIHAT IKLAN"
+
+                        ).show()
                     }
                 }
                 MainViewModel.Status.ERROR_NOT_FOUND -> {
@@ -65,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                     binding.webView.loadData(html.replace("\n", "<br>"), "text/html", "UTF-8")
                 }
                 MainViewModel.Status.ERROR_DATA -> {
-                    Toast.makeText(this, "Gagal Memuat Data, Coba lagi nanti", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Gagal Memuat Data, Coba lagi nanti", Toast.LENGTH_SHORT)
+                        .show()
                 }
                 else -> {
                     Toast.makeText(
@@ -81,9 +97,12 @@ class MainActivity : AppCompatActivity() {
             binding.webView.loadData("<html></html>", "text/html", "UTF-8")
             binding.edtMeter.text.toString().let {
                 if (it.isBlank()) {
-                    Toast.makeText(this, "Mohon ini nomor Meter/Pelanggan dengan benar", Toast.LENGTH_SHORT).show()
-                }
-                else {
+                    Toast.makeText(
+                        this,
+                        "Mohon ini nomor Meter/Pelanggan dengan benar",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
                     binding.edtMeter.clearFocus()
                     dialog = setProgressDialog(this, "Menyiapkan data").apply {
                         show()
@@ -111,37 +130,29 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun setProgressDialog(context: Context, message: String):AlertDialog {
+    fun setProgressDialog(context: Context, message: String): AlertDialog {
         val llPadding = 30
         val ll = LinearLayout(context)
-        ll.orientation = LinearLayout.HORIZONTAL
+        ll.orientation = LinearLayout.VERTICAL
         ll.setPadding(llPadding, llPadding, llPadding, llPadding)
-        ll.gravity = Gravity.CENTER
-        var llParam = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        llParam.gravity = Gravity.CENTER
-        ll.layoutParams = llParam
+        ll.gravity = Gravity.CENTER_HORIZONTAL
 
         val progressBar = ProgressBar(context)
         progressBar.isIndeterminate = true
         progressBar.setPadding(0, 0, llPadding, 0)
-        progressBar.layoutParams = llParam
 
-        llParam = LinearLayout.LayoutParams(
+        val llParam = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        llParam.gravity = Gravity.CENTER_VERTICAL
+        llParam.gravity = Gravity.CENTER_HORIZONTAL
         val tvText = TextView(context)
         tvText.text = message
         tvText.setTextColor(Color.parseColor("#000000"))
         tvText.textSize = 20.toFloat()
-        tvText.layoutParams = llParam
 
-        ll.addView(progressBar)
-        ll.addView(tvText)
+        ll.addView(progressBar, llParam)
+        ll.addView(tvText, llParam)
 
         val builder = AlertDialog.Builder(context)
         builder.setCancelable(true)
@@ -171,7 +182,8 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         try {
             if (requestCode == IntentIntegrator.REQUEST_CODE) {
-                val scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+                val scanningResult =
+                    IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
                 if (scanningResult != null) {
                     if (scanningResult.contents != null) {
                         val scanContent = scanningResult.contents.toString()
@@ -183,30 +195,27 @@ class MainActivity : AppCompatActivity() {
                         binding.btnCheck.callOnClick()
                     }
                 }
-            }
-            else if (requestCode == REQUEST_CAPCHA) {
+            } else if (requestCode == REQUEST_CAPCHA) {
                 if (resultCode == RESULT_OK) {
                     data?.getStringExtra("captcha")?.let {
                         viewModel.getInfo(it, binding.edtMeter.text.toString())
                     }
-                }
-                else {
+                } else {
                     dialog.dismiss()
                 }
             }
 
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             Log.e(javaClass.simpleName, "", e)
         }
     }
 
-    fun stripFirstAlpha(text:String) : String {
+    fun stripFirstAlpha(text: String): String {
         val sb = StringBuilder()
         text.toCharArray().forEach {
             if (sb.isEmpty() && it.toString().matches(Regex("[A-Z]"))) {
 
-            }
-            else {
+            } else {
                 sb.append(it)
             }
         }
@@ -214,8 +223,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     var rewardedAd: RewardedInterstitialAd? = null
-    private fun showRewardAds() {
-        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE).getBoolean("ADS_IGNORE", false)) {
+    private fun showRewardAds(onFinish: () -> Unit) {
+        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE)
+                .getBoolean("ADS_IGNORE", false)
+        ) {
+            onFinish()
             return
         }
         RewardedInterstitialAd.load(this@MainActivity,
@@ -228,6 +240,7 @@ class MainActivity : AppCompatActivity() {
                         FullScreenContentCallback() {
                         /** Called when the ad failed to show full screen content.  */
                         override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                            onFinish()
                         }
 
                         /** Called when ad showed the full screen content.  */
@@ -236,18 +249,24 @@ class MainActivity : AppCompatActivity() {
 
                         /** Called when full screen content is dismissed.  */
                         override fun onAdDismissedFullScreenContent() {
+                            onFinish()
                         }
                     }
-                    rewardedAd?.show(this@MainActivity) { }
+                    rewardedAd?.show(this@MainActivity) {
+                        onFinish()
+                    }
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError?) {
+                    onFinish()
                 }
             })
     }
 
     private fun showDialogTerm() {
-        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE).getBoolean("TERM_AGREE", false)) {
+        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE)
+                .getBoolean("TERM_AGREE", false)
+        ) {
             return
         }
 
@@ -272,7 +291,8 @@ class MainActivity : AppCompatActivity() {
             this.getSharedPreferences("SYS", Context.MODE_PRIVATE)
                 .edit()
                 .putBoolean("TERM_AGREE", true).commit()
-            dialog.dismiss() }
+            dialog.dismiss()
+        }
         dialog.show()
 
     }
@@ -288,7 +308,7 @@ class MainActivity : AppCompatActivity() {
         context.startActivity(intent)
     }
 
-    fun getTerms(appName: String) : String {
+    fun getTerms(appName: String): String {
         return "<h2> <b> Persyaratan dan Ketentuan </b> </h2>\n" +
                 "<p> Selamat datang di $appName </p>\n" +
                 "<p> Syarat dan ketentuan ini menguraikan aturan dan ketentuan penggunaan aplikasi $appName, yang terletak di google play store </p>\n" +

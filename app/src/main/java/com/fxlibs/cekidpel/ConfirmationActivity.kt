@@ -36,6 +36,10 @@ class ConfirmationActivity : AppCompatActivity() {
 
         } )
 
+        binding.edtCapcha.setOnEditorActionListener { textView, i, keyEvent ->
+            binding.btnSubmit.callOnClick()
+            true
+        }
 
         binding.btnSubmit.setOnClickListener {
             if (binding.edtCapcha.text.isBlank()) {
