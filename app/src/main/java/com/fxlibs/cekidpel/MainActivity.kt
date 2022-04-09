@@ -70,6 +70,13 @@ class MainActivity : AppCompatActivity() {
                                     )
                                 }
                             },
+                            onTimeout = {
+                                binding.webView.loadData(
+                                    html.replace("\n", "<br>"),
+                                    "text/html",
+                                    "UTF-8"
+                                )
+                            },
                             textAction = "LIHAT IKLAN"
 
                         ).show()

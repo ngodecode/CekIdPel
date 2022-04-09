@@ -12,6 +12,7 @@ class CountDownDialog(
     description: String,
     textAction: String,
     onAction: ((dialog:CountDownDialog) -> Unit)?,
+    onTimeout: ((dialog:CountDownDialog) -> Unit)?,
 )  {
 
     private var timer:CountDownTimer
@@ -24,6 +25,7 @@ class CountDownDialog(
         binding.description.text = description
         binding.submitButton.text = textAction
         binding.submitButton.setOnClickListener {
+            binding.submitButton.isEnabled = false
             onAction?.invoke(this)
         }
         alertDialog = AlertDialog.Builder(context).setView(binding.root).create()
@@ -33,7 +35,7 @@ class CountDownDialog(
             }
 
             override fun onFinish() {
-                onAction?.invoke(this@CountDownDialog)
+                onTimeout?.invoke(this@CountDownDialog)
                 alertDialog.dismiss()
             }
         }
