@@ -117,19 +117,12 @@ class MainViewModel : ViewModel() {
                         val nama_kab    = getValue(list, "nama_kab")?: ""
                         val namapnj     = getValue(list, "namapnj")?: ""
                         val tarif       = getValue(list, "tarif")
-                        val subsidi      = tarif?.let {
-                            when {
-                                it.endsWith("M") -> {
-                                    "/ TIDAK BERSUBSIDI"
-                                }
-                                it.endsWith("T") -> {
-                                    "/ BERSUBSIDI"
-                                }
-                                else -> {
-                                    ""
+                        var subsidi     = ""
+                            if (daya?.matches(Regex("450|900")) == true) {
+                                if (tarif?.matches(Regex("R1|R1T")) == true) {
+                                    subsidi = "/ BERSUBSIDI"
                                 }
                             }
-                        } ?: ""
 
                         if (by == "nometer" && nama == null) {
                             getInfo(capcha, idPel, "idpel")
