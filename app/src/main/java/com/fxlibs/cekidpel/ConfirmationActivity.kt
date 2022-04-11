@@ -79,7 +79,6 @@ class ConfirmationActivity : AppCompatActivity() {
             when (it.status) {
                 MainViewModel.Status.SUCCESS -> {
                     it.data?.let { html ->
-                        Log.e("XXX", "showAds!");
                         showAds {
                             startActivity(Intent(this, ResultActivity::class.java).apply {
                                 putExtra("data", html)

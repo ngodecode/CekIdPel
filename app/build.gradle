@@ -10,8 +10,8 @@ android {
         applicationId "com.fxlibs.cekidpel"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 7
-        versionName "2.1"
+        versionCode 9
+        versionName "3.1"
         multiDexEnabled = true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

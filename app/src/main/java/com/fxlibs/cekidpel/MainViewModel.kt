@@ -137,6 +137,9 @@ class MainViewModel : ViewModel() {
                                     "<tr><td>LOKASI </td><td> : $namapnj $nama_kec $nama_kel $nama_prov $nama_kab </td></tr>"
 
                             html += "</table>\n"
+                            html += "<p>Dokumen ini hanya sekedar informasi apa adanya dan tidak dapat menjadi acuan atau referensi untuk maksud apapun.</p>\n"
+                            html += "<p>Apabila terdapat perbedaan dengan data dari PLN maka data ini tidak memiliki kekuatan apapun.</p>\n"
+
                             getBill(idPel, html)
                         }
 
@@ -157,7 +160,7 @@ class MainViewModel : ViewModel() {
 
     private fun getBill(idPel: String, info:String) {
 
-        val link = "\n\n<a href='https://play.google.com/store/apps/details?id=com.ftools.ceksubsidi'> Klik disini untuk Cek Subsidi/Stimulus >> </a>"
+        val link = ""
         val body = "id=$idPel&jenis=1&kode=TU&hm_csrf_hash_name=5739f00f9517eb39c12732f65c3f3d93"
         ApiTagihan.get().getBillStatus(body).enqueue(object : Callback<String> {
 

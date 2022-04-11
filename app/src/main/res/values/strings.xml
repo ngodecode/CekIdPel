@@ -7,7 +7,7 @@
     <string name="ads_unit_interstitial">ca-app-pub-3940256099942544/1033173712</string>
 
     <!--Release Ads-->
-    <!--    <string name="ads_unit_banner1">ca-app-pub-3007919778406514/5293475819</string>-->
-    <!--    <string name="ads_unit_banner2">ca-app-pub-3007919778406514/6850100060</string>-->
-    <!--    <string name="ads_unit_interstitial">ca-app-pub-3007919778406514/1420285465</string>-->
+<!--        <string name="ads_unit_banner1">ca-app-pub-3007919778406514/5293475819</string>-->
+<!--        <string name="ads_unit_banner2">ca-app-pub-3007919778406514/6850100060</string>-->
+<!--        <string name="ads_unit_interstitial">ca-app-pub-3007919778406514/1420285465</string>-->
 </resources>
