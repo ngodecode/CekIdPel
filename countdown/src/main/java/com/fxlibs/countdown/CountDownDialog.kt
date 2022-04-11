@@ -20,6 +20,7 @@ class CountDownDialog(
     private var binding: DialogCountDownBinding = DialogCountDownBinding.inflate(LayoutInflater.from(context))
 
     init {
+        binding.cancelButton.text = "Batal"
         binding.txtTitle.text = title
         binding.txtProgress.text = title
         binding.description.text = description
@@ -38,6 +39,12 @@ class CountDownDialog(
                 onTimeout?.invoke(this@CountDownDialog)
                 alertDialog.dismiss()
             }
+        }
+        binding.cancelButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+        alertDialog.setOnDismissListener {
+            timer.cancel()
         }
     }
 

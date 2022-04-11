@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_confirmation.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_result.xml" value="0.10371376811594203" />
         <entry key="countdown/src/main/res/layout/activity_count_down.xml" value="0.1" />
         <entry key="countdown/src/main/res/layout/dialog_count_down.xml" value="0.165" />
       </map>

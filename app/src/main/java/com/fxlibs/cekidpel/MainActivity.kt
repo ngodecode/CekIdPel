@@ -16,10 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.fxlibs.cekidpel.databinding.ActivityMainBinding
-import com.fxlibs.countdown.CountDownDialog
 import com.google.android.gms.ads.*
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.CaptureActivity
 
@@ -39,9 +38,12 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.dataCaptcha.observe(this, Observer {
             if (it.status == MainViewModel.Status.SUCCESS) {
-                startActivityForResult(Intent(this, ConfirmationActivity::class.java).apply {
+                dialog.dismiss()
+                startActivity(Intent(this, ConfirmationActivity::class.java).apply {
                     putExtra("image", it.data)
-                }, REQUEST_CAPCHA)
+                    putExtra("cookie", viewModel.mCookie)
+                    putExtra("idpel", binding.edtMeter.text.toString())
+                })
             } else {
                 dialog.dismiss()
                 Toast.makeText(
@@ -51,55 +53,6 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         })
-        viewModel.dataInfo.observe(this, Observer {
-            dialog.dismiss()
-            when (it.status) {
-                MainViewModel.Status.SUCCESS -> {
-                    it.data?.let { html ->
-                        CountDownDialog(
-                            context = this,
-                            title = "Memuat Informasi",
-                            description = "Anda dapat mempercepat waktu dengan menonton iklan",
-                            onAction = { cdDialog ->
-                                showRewardAds {
-                                    cdDialog.dismiss()
-                                    binding.webView.loadData(
-                                        html.replace("\n", "<br>"),
-                                        "text/html",
-                                        "UTF-8"
-                                    )
-                                }
-                            },
-                            onTimeout = {
-                                binding.webView.loadData(
-                                    html.replace("\n", "<br>"),
-                                    "text/html",
-                                    "UTF-8"
-                                )
-                            },
-                            textAction = "LIHAT IKLAN"
-
-                        ).show()
-                    }
-                }
-                MainViewModel.Status.ERROR_NOT_FOUND -> {
-                    val html = "<p>Maaf sitem kami tidak berhasil menemukan informasi!</p>"
-                    binding.webView.loadData(html.replace("\n", "<br>"), "text/html", "UTF-8")
-                }
-                MainViewModel.Status.ERROR_DATA -> {
-                    Toast.makeText(this, "Gagal Memuat Data, Coba lagi nanti", Toast.LENGTH_SHORT)
-                        .show()
-                }
-                else -> {
-                    Toast.makeText(
-                        this,
-                        "Gagal Memuat Data, Periksa Koneksi Anda",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        })
-
         binding.btnCheck.setOnClickListener {
             binding.webView.loadData("<html></html>", "text/html", "UTF-8")
             binding.edtMeter.text.toString().let {
@@ -202,14 +155,6 @@ class MainActivity : AppCompatActivity() {
                         binding.btnCheck.callOnClick()
                     }
                 }
-            } else if (requestCode == REQUEST_CAPCHA) {
-                if (resultCode == RESULT_OK) {
-                    data?.getStringExtra("captcha")?.let {
-                        viewModel.getInfo(it, binding.edtMeter.text.toString())
-                    }
-                } else {
-                    dialog.dismiss()
-                }
             }
 
         } catch (e: Exception) {
@@ -229,46 +174,7 @@ class MainActivity : AppCompatActivity() {
         return sb.toString()
     }
 
-    var rewardedAd: RewardedInterstitialAd? = null
-    private fun showRewardAds(onFinish: () -> Unit) {
-        if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE)
-                .getBoolean("ADS_IGNORE", false)
-        ) {
-            onFinish()
-            return
-        }
-        RewardedInterstitialAd.load(this@MainActivity,
-            resources.getString(R.string.ads_unit_reward),
-            AdRequest.Builder().build(),
-            object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                    rewardedAd = ad
-                    rewardedAd?.fullScreenContentCallback = object :
-                        FullScreenContentCallback() {
-                        /** Called when the ad failed to show full screen content.  */
-                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                            onFinish()
-                        }
 
-                        /** Called when ad showed the full screen content.  */
-                        override fun onAdShowedFullScreenContent() {
-                        }
-
-                        /** Called when full screen content is dismissed.  */
-                        override fun onAdDismissedFullScreenContent() {
-                            onFinish()
-                        }
-                    }
-                    rewardedAd?.show(this@MainActivity) {
-                        onFinish()
-                    }
-                }
-
-                override fun onAdFailedToLoad(loadAdError: LoadAdError?) {
-                    onFinish()
-                }
-            })
-    }
 
     private fun showDialogTerm() {
         if (this.getSharedPreferences("SYS", Context.MODE_PRIVATE)
@@ -302,17 +208,6 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.show()
 
-    }
-
-    fun startNewActivity(context: Context, packageName: String) {
-        var intent = context.packageManager.getLaunchIntentForPackage(packageName)
-        if (intent == null) {
-            // Bring user to the market or let them choose an app?
-            intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("market://details?id=$packageName")
-        }
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
     }
 
     fun getTerms(appName: String): String {
